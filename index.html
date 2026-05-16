@@ -1,0 +1,557 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#f0f0f0;color:#1a1a1a;font-family:'DM Sans',sans-serif}
+  .app{max-width:720px;margin:0 auto;padding:1.25rem 1rem 3rem;background:#f0f0f0;min-height:100vh}
+  .top-bar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem;background:#fff;border-radius:14px;padding:1rem 1.25rem;border:0.5px solid #ddd}
+  .logo{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:#c0392b;line-height:1}
+  .logo-sub{font-size:11px;color:#888;margin-top:2px;letter-spacing:.3px}
+  .unit-toggle{display:flex;background:#f5f5f5;border-radius:8px;padding:3px;border:0.5px solid #ddd}
+  .unit-btn{padding:5px 14px;border:none;background:transparent;color:#888;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;border-radius:6px;cursor:pointer;transition:all .2s}
+  .unit-btn.active{background:#c0392b;color:#fff}
+  .tabs{display:flex;gap:4px;margin-bottom:1.25rem;background:#fff;border-radius:10px;padding:4px;border:0.5px solid #ddd}
+  .tab{flex:1;padding:9px 4px;border:none;background:transparent;color:#888;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;border-radius:7px;cursor:pointer;transition:all .2s}
+  .tab.active{background:#c0392b;color:#fff}
+  .card{background:#fff;border-radius:14px;padding:1.25rem;border:0.5px solid #ddd;margin-bottom:1rem}
+  .section-label{font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.8px;margin-bottom:.5rem}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+  select,input[type=date],input[type=number],input[type=text]{width:100%;padding:9px 12px;background:#f9f9f9;border:0.5px solid #ddd;border-radius:8px;color:#1a1a1a;font-family:'DM Sans',sans-serif;font-size:14px;appearance:none;-webkit-appearance:none;outline:none;transition:border-color .2s}
+  select:focus,input:focus{border-color:#c0392b;background:#fff}
+  .schedule-box{background:#fff5f5;border:0.5px solid #f5c6c6;border-radius:10px;padding:.9rem 1rem;margin-bottom:1rem;display:none}
+  .schedule-box.visible{display:block}
+  .schedule-title{font-size:12px;font-weight:500;color:#c0392b;margin-bottom:4px}
+  .schedule-parts{font-size:13px;color:#555;display:flex;gap:6px;flex-wrap:wrap}
+  .sch-pill{background:#c0392b15;border:0.5px solid #c0392b40;border-radius:20px;padding:3px 10px;font-size:12px;color:#c0392b;font-weight:500}
+  .body-parts{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem}
+  .bp-chip{padding:6px 14px;border-radius:20px;border:0.5px solid #ddd;background:#f5f5f5;color:#888;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
+  .bp-chip.active{background:#c0392b;color:#fff;border-color:#c0392b}
+  .exercise-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:200px;overflow-y:auto;margin-bottom:1rem}
+  .ex-card{padding:9px 12px;border-radius:8px;border:0.5px solid #ddd;background:#f9f9f9;color:#888;font-size:13px;cursor:pointer;transition:all .2s;text-align:left;font-family:'DM Sans',sans-serif}
+  .ex-card.active{border-color:#c0392b;color:#c0392b;background:#fff5f5}
+  .ex-card:hover:not(.active){border-color:#bbb;color:#333;background:#fff}
+  .sets-header{display:grid;grid-template-columns:40px 1fr 1fr 36px;gap:8px;margin-bottom:6px;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.6px;padding:0 4px}
+  .set-row{display:grid;grid-template-columns:40px 1fr 1fr 36px;gap:8px;margin-bottom:6px;align-items:center}
+  .set-num{background:#c0392b;color:#fff;border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500}
+  .remove-btn{width:28px;height:28px;border-radius:6px;border:0.5px solid #ddd;background:#f9f9f9;color:#aaa;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+  .remove-btn:hover{background:#fff0f0;border-color:#c0392b;color:#c0392b}
+  .add-set-btn{width:100%;padding:9px;border:0.5px dashed #ddd;border-radius:8px;background:transparent;color:#aaa;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;margin-top:4px}
+  .add-set-btn:hover{border-color:#c0392b;color:#c0392b}
+  .save-btn{width:100%;padding:13px;background:#c0392b;color:#fff;border:none;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:1px;cursor:pointer;margin-top:1rem;transition:all .2s}
+  .save-btn:hover{background:#a93226}
+  .divider{height:0.5px;background:#eee;margin:1rem 0}
+  .msg{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:1rem;display:none}
+  .msg.success{background:#eafaf1;color:#1e8449;border:0.5px solid #a9dfbf;display:block}
+  .msg.error{background:#fdedec;color:#c0392b;border:0.5px solid #f5b7b1;display:block}
+  .history-empty{text-align:center;padding:3rem;color:#aaa;font-size:14px}
+  .history-day{margin-bottom:1.2rem}
+  .day-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem}
+  .day-label{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px;color:#c0392b}
+  .day-date{font-size:12px;color:#aaa}
+  .workout-entry{background:#fff;border-radius:10px;padding:1rem;border:0.5px solid #ddd;margin-bottom:6px}
+  .entry-part{font-size:11px;color:#c0392b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+  .entry-name{font-size:14px;font-weight:500;margin-bottom:.5rem;color:#1a1a1a}
+  .sets-summary{display:flex;flex-wrap:wrap;gap:6px}
+  .set-pill{background:#f5f5f5;border-radius:6px;padding:4px 10px;font-size:12px;color:#888}
+  .set-pill span{color:#1a1a1a;font-weight:500}
+  .pr-badge{display:inline-flex;align-items:center;gap:4px;background:#fef9e7;color:#d4ac0d;border:0.5px solid #f9e79f;border-radius:5px;font-size:11px;padding:2px 7px;margin-left:6px;font-weight:500}
+  .del-entry{background:transparent;border:none;color:#ccc;cursor:pointer;font-size:15px;transition:color .2s}
+  .del-entry:hover{color:#c0392b}
+  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+  .stat-box{background:#fff;border-radius:10px;padding:.9rem;border:0.5px solid #ddd;text-align:center}
+  .stat-num{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:#c0392b;line-height:1}
+  .stat-lbl{font-size:11px;color:#aaa;margin-top:3px}
+  .pr-section{background:#fff;border-radius:14px;padding:1.25rem;border:0.5px solid #ddd;margin-bottom:1rem}
+  .pr-table{width:100%;border-collapse:collapse;font-size:13px}
+  .pr-table th{text-align:left;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.6px;padding:0 0 8px;font-weight:500}
+  .pr-table td{padding:7px 0;border-top:0.5px solid #eee;color:#1a1a1a}
+  .pr-table td:last-child{text-align:right;color:#c0392b;font-weight:500;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.5px}
+  .export-bar{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+  .export-btn{flex:1;min-width:140px;padding:10px 14px;border:0.5px solid #ddd;border-radius:8px;background:#fff;color:#555;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;justify-content:center;transition:all .2s}
+  .export-btn:hover{border-color:#c0392b;color:#c0392b;background:#fff5f5}
+  .filter-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+  .filter-row select,.filter-row input{flex:1;min-width:130px;padding:8px 12px}
+  input[type=number]::-webkit-inner-spin-button{opacity:.4}
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+</style>
+
+<div class="app">
+  <h2 class="sr-only">Chinmay's Gym Log — personal workout tracker</h2>
+
+  <div class="top-bar">
+    <div>
+      <div class="logo">Chinmay's Gym Log</div>
+      <div class="logo-sub">Track every rep. Own every session.</div>
+    </div>
+    <div style="text-align:right">
+      <div class="section-label" style="margin-bottom:4px">Weight unit</div>
+      <div class="unit-toggle">
+        <button class="unit-btn active" id="btn-kg" onclick="setUnit('kg')">kg</button>
+        <button class="unit-btn" id="btn-lbs" onclick="setUnit('lbs')">lbs</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('log')"><i class="ti ti-pencil" aria-hidden="true"></i> Log</button>
+    <button class="tab" onclick="switchTab('history')"><i class="ti ti-history" aria-hidden="true"></i> History</button>
+    <button class="tab" onclick="switchTab('prs')"><i class="ti ti-trophy" aria-hidden="true"></i> PRs</button>
+    <button class="tab" onclick="switchTab('stats')"><i class="ti ti-chart-bar" aria-hidden="true"></i> Stats</button>
+    <button class="tab" onclick="switchTab('export')"><i class="ti ti-download" aria-hidden="true"></i> Export</button>
+  </div>
+
+  <!-- LOG TAB -->
+  <div id="tab-log">
+    <div id="msg" class="msg"></div>
+    <div class="card">
+      <div class="two-col">
+        <div>
+          <div class="section-label">Date</div>
+          <input type="date" id="workout-date" />
+        </div>
+        <div>
+          <div class="section-label">Day</div>
+          <select id="workout-day" onchange="onDayChange()">
+            <option value="">Select day</option>
+            <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+            <option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="schedule-box" id="schedule-box">
+        <div class="schedule-title"><i class="ti ti-calendar-event" aria-hidden="true"></i> Today's schedule</div>
+        <div class="schedule-parts" id="schedule-parts"></div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-label" style="margin-top:1rem">Body part</div>
+      <div class="body-parts" id="body-parts"></div>
+      <div class="section-label">Exercise</div>
+      <div class="exercise-grid" id="exercise-grid"></div>
+      <div class="section-label" style="margin-top:.5rem">Custom exercise</div>
+      <input type="text" id="custom-ex" placeholder="Or type a custom exercise…" style="margin-bottom:1rem" />
+      <div class="divider"></div>
+      <div class="section-label" style="margin-top:1rem">Sets</div>
+      <div class="sets-header"><div>Set</div><div>Reps</div><div id="weight-col-label">Weight (kg)</div><div></div></div>
+      <div id="sets-container"></div>
+      <button class="add-set-btn" onclick="addSet()"><i class="ti ti-plus" aria-hidden="true"></i> Add set</button>
+      <button class="save-btn" onclick="saveWorkout()">Save Workout</button>
+    </div>
+  </div>
+
+  <!-- HISTORY TAB -->
+  <div id="tab-history" style="display:none">
+    <div class="card" style="padding:.75rem 1rem">
+      <div class="filter-row">
+        <select id="filter-part" onchange="renderHistory()"><option value="">All body parts</option></select>
+        <select id="filter-ex" onchange="renderHistory()"><option value="">All exercises</option></select>
+        <input type="date" id="filter-from" onchange="renderHistory()" placeholder="From" />
+        <input type="date" id="filter-to" onchange="renderHistory()" placeholder="To" />
+      </div>
+    </div>
+    <div id="history-content"></div>
+  </div>
+
+  <!-- PRs TAB -->
+  <div id="tab-prs" style="display:none">
+    <div id="prs-content"></div>
+  </div>
+
+  <!-- STATS TAB -->
+  <div id="tab-stats" style="display:none">
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-num" id="stat-sessions">0</div><div class="stat-lbl">Sessions</div></div>
+      <div class="stat-box"><div class="stat-num" id="stat-exercises">0</div><div class="stat-lbl">Exercises logged</div></div>
+      <div class="stat-box"><div class="stat-num" id="stat-sets">0</div><div class="stat-lbl">Total sets</div></div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-num" id="stat-volume">0</div><div class="stat-lbl" id="stat-volume-lbl">Total volume (kg)</div></div>
+      <div class="stat-box"><div class="stat-num" id="stat-prs">0</div><div class="stat-lbl">Personal records</div></div>
+      <div class="stat-box"><div class="stat-num" id="stat-streak">0</div><div class="stat-lbl">Day streak</div></div>
+    </div>
+    <div class="card" id="stats-detail"><div style="color:#aaa;text-align:center;padding:1rem">Log workouts to see stats here.</div></div>
+  </div>
+
+  <!-- EXPORT TAB -->
+  <div id="tab-export" style="display:none">
+    <div class="card">
+      <div class="section-label" style="margin-bottom:1rem">Export your workout data</div>
+      <p style="font-size:13px;color:#888;margin-bottom:1.25rem">Download your workout log as an Excel-compatible CSV file. You can open it directly in Microsoft Excel, Google Sheets, or any spreadsheet app.</p>
+      <div style="background:#f9f9f9;border-radius:10px;padding:1rem;border:0.5px solid #eee;margin-bottom:1.25rem">
+        <div class="section-label" style="margin-bottom:.5rem">What's included in the export</div>
+        <div style="font-size:13px;color:#555;display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div><i class="ti ti-check" style="color:#c0392b;font-size:14px" aria-hidden="true"></i> Date &amp; Day</div>
+          <div><i class="ti ti-check" style="color:#c0392b;font-size:14px" aria-hidden="true"></i> Body part</div>
+          <div><i class="ti ti-check" style="color:#c0392b;font-size:14px" aria-hidden="true"></i> Exercise name</div>
+          <div><i class="ti ti-check" style="color:#c0392b;font-size:14px" aria-hidden="true"></i> Set number</div>
+          <div><i class="ti ti-check" style="color:#c0392b;font-size:14px" aria-hidden="true"></i> Reps per set</div>
+          <div><i class="ti ti-check" style="color:#c0392b;font-size:14px" aria-hidden="true"></i> Weight (kg &amp; lbs)</div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="section-label" style="margin:1rem 0 .75rem">Filter before exporting (optional)</div>
+      <div class="filter-row" style="margin-bottom:1rem">
+        <select id="exp-filter-part"><option value="">All body parts</option></select>
+        <select id="exp-filter-ex"><option value="">All exercises</option></select>
+        <input type="date" id="exp-from" placeholder="From date" />
+        <input type="date" id="exp-to" placeholder="To date" />
+      </div>
+      <div class="export-bar">
+        <button class="export-btn" style="flex:2;background:#c0392b;color:#fff;border-color:#c0392b" onclick="exportExcel()">
+          <i class="ti ti-file-spreadsheet" aria-hidden="true"></i> Download Excel (CSV)
+        </button>
+      </div>
+      <div style="font-size:11px;color:#aaa;margin-top:.5rem;text-align:center">Opens in Excel, Google Sheets, Numbers, and all major spreadsheet apps</div>
+    </div>
+    <div class="card" id="export-preview-card" style="display:none">
+      <div class="section-label" style="margin-bottom:.75rem">Preview (last 5 rows)</div>
+      <div id="export-preview" style="overflow-x:auto;font-size:12px"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SCHEDULE = {
+  Monday:['Legs','Shoulders'],Tuesday:['Chest','Triceps'],Wednesday:['Back','Biceps'],
+  Thursday:['Legs','Shoulders'],Friday:['Chest','Triceps'],Saturday:['Back','Biceps'],Sunday:[]
+};
+const EXERCISES = {
+  'Legs':['Barbell Squat','Sumo Squat','Front Squats','Front Hack Squats','Leg Press','Leg Extensions','Leg Curls','Calf Raises'],
+  'Shoulders':['Dumbbell Press','Barbell Press','Lateral Raises','Rear Delt Flys','Shrugs','Face Pulls','Barbell Pulls'],
+  'Back':['Dead Lift','Hyper Extensions','Lat Pull Down','Supinated Lat Pull Down','Closed Grip Pull Down','Seated Rowing','Bent Over Rows','Chest Supported Rowing','T-Bar Rows','Straight Arm Rows','Dumbbell Rows'],
+  'Chest':['Flat Bench Press','Inclined Bench Press','Decline Bench Press','Peck Deck','Incline Flyers','Cable Cross Over'],
+  'Triceps':['Skull Crushers','Triceps Push Down','Reverse Pulls','Skull Crushers (Dumbbell)','Triceps Kick Back'],
+  'Biceps':['Dumbbell Curls','Barbell Curls (Normal)','Barbell Curls (Close)','Barbell Curls (Wide)','Hammer Curls']
+};
+const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const KG_TO_LBS=2.20462;
+
+let selectedPart='',selectedExercise='',sets=[],unit='kg';
+let workouts=[];
+try{workouts=JSON.parse(localStorage.getItem('chinmaygym_v2')||'[]');}catch(e){workouts=[];}
+
+function persist(){try{localStorage.setItem('chinmaygym_v2',JSON.stringify(workouts));}catch(e){}}
+function setUnit(u){
+  unit=u;
+  document.getElementById('btn-kg').classList.toggle('active',u==='kg');
+  document.getElementById('btn-lbs').classList.toggle('active',u==='lbs');
+  document.getElementById('weight-col-label').textContent='Weight ('+u+')';
+  try{localStorage.setItem('chinmaygym_unit',u);}catch(e){}
+}
+function dispW(kg){return unit==='lbs'?Math.round(kg*KG_TO_LBS*10)/10:parseFloat(kg)||0;}
+function storeW(val){return unit==='lbs'?Math.round((parseFloat(val)/KG_TO_LBS)*100)/100:parseFloat(val)||0;}
+
+function initDate(){
+  const d=document.getElementById('workout-date');
+  const today=new Date();
+  d.value=today.toISOString().split('T')[0];
+  document.getElementById('workout-day').value=DAYS[today.getDay()];
+  onDayChange();
+  d.addEventListener('change',function(){
+    const dt=new Date(this.value+'T00:00:00');
+    document.getElementById('workout-day').value=DAYS[dt.getDay()];
+    onDayChange();
+  });
+}
+
+function onDayChange(){
+  const day=document.getElementById('workout-day').value;
+  const box=document.getElementById('schedule-box');
+  const parts=document.getElementById('schedule-parts');
+  const sch=SCHEDULE[day];
+  if(sch&&sch.length){
+    box.className='schedule-box visible';
+    parts.innerHTML=sch.map(p=>`<span class="sch-pill">${p}</span>`).join('');
+  } else {
+    box.className='schedule-box';
+  }
+  buildBodyPartsForDay(day);
+}
+
+function buildBodyPartsForDay(day){
+  const c=document.getElementById('body-parts');c.innerHTML='';
+  const sch=SCHEDULE[day]||[];
+  const all=Object.keys(EXERCISES);
+  const ordered=[...sch,...all.filter(p=>!sch.includes(p))];
+  ordered.forEach(p=>{
+    const b=document.createElement('button');b.className='bp-chip';b.textContent=p;
+    if(sch.includes(p))b.style.borderColor='#c0392b50';
+    b.onclick=()=>selectBodyPart(p);
+    c.appendChild(b);
+  });
+  selectedPart='';selectedExercise='';
+  document.getElementById('exercise-grid').innerHTML='';
+}
+
+function selectBodyPart(p){
+  selectedPart=p;selectedExercise='';
+  document.querySelectorAll('.bp-chip').forEach(b=>b.classList.toggle('active',b.textContent===p));
+  buildExercises();
+}
+
+function buildExercises(){
+  const g=document.getElementById('exercise-grid');g.innerHTML='';
+  if(!selectedPart)return;
+  (EXERCISES[selectedPart]||[]).forEach(ex=>{
+    const b=document.createElement('button');b.className='ex-card';b.textContent=ex;
+    b.onclick=()=>{
+      selectedExercise=ex;
+      document.getElementById('custom-ex').value='';
+      document.querySelectorAll('.ex-card').forEach(c=>c.classList.remove('active'));
+      b.classList.add('active');
+    };
+    g.appendChild(b);
+  });
+}
+
+function addSet(){sets.push({reps:'',weight:0});renderSets();}
+function removeSet(i){sets.splice(i,1);renderSets();}
+function renderSets(){
+  const c=document.getElementById('sets-container');c.innerHTML='';
+  sets.forEach((s,i)=>{
+    const row=document.createElement('div');row.className='set-row';
+    const wDisp=s.weight?dispW(s.weight):'';
+    row.innerHTML=`<div><div class="set-num">${i+1}</div></div>
+      <input type="number" min="1" max="999" step="1" placeholder="e.g. 10" value="${s.reps}" oninput="sets[${i}].reps=this.value" style="height:36px" />
+      <input type="number" min="0" max="9999" step="0.5" placeholder="e.g. 60" value="${wDisp}" oninput="sets[${i}].weight=storeW(this.value)" style="height:36px" />
+      <button class="remove-btn" onclick="removeSet(${i})" aria-label="Remove set ${i+1}"><i class="ti ti-x" aria-hidden="true"></i></button>`;
+    c.appendChild(row);
+  });
+}
+
+function showMsg(text,type){
+  const m=document.getElementById('msg');m.textContent=text;m.className='msg '+type;
+  setTimeout(()=>{m.className='msg';},3500);
+}
+
+function getPR(exercise){
+  let max=0;
+  workouts.forEach(w=>{if(w.exercise===exercise)w.sets.forEach(s=>{const v=parseFloat(s.weight)||0;if(v>max)max=v;});});
+  return max;
+}
+function isNewPR(exercise,weight){
+  const pr=getPR(exercise);
+  return parseFloat(weight)>pr&&parseFloat(weight)>0;
+}
+
+function saveWorkout(){
+  const date=document.getElementById('workout-date').value;
+  const day=document.getElementById('workout-day').value;
+  const customEx=document.getElementById('custom-ex').value.trim();
+  const exercise=customEx||selectedExercise;
+  const bodyPart=selectedPart||(customEx?'Other':'');
+  if(!date){showMsg('Please pick a date.','error');return;}
+  if(!day){showMsg('Please select a day.','error');return;}
+  if(!exercise){showMsg('Please select or type an exercise.','error');return;}
+  if(!sets.length){showMsg('Add at least one set.','error');return;}
+  if(sets.some(s=>!s.reps)){showMsg('Fill in reps for every set.','error');return;}
+  const hasPR=sets.some(s=>isNewPR(exercise,s.weight));
+  workouts.push({id:Date.now(),date,day,exercise,bodyPart,sets:JSON.parse(JSON.stringify(sets))});
+  workouts.sort((a,b)=>b.date.localeCompare(a.date));
+  persist();
+  selectedExercise='';selectedPart='';sets=[];
+  document.querySelectorAll('.bp-chip,.ex-card').forEach(b=>b.classList.remove('active'));
+  document.getElementById('custom-ex').value='';
+  document.getElementById('exercise-grid').innerHTML='';
+  renderSets();
+  showMsg(hasPR?'New personal record! 🏆 Workout saved!':'Workout saved successfully!','success');
+  populateFilters();
+}
+
+function switchTab(t){
+  ['log','history','prs','stats','export'].forEach(tab=>{
+    document.getElementById('tab-'+tab).style.display=tab===t?'block':'none';
+  });
+  document.querySelectorAll('.tab').forEach((b,i)=>{
+    b.classList.toggle('active',['log','history','prs','stats','export'][i]===t);
+  });
+  if(t==='history'){populateFilters();renderHistory();}
+  if(t==='prs')renderPRs();
+  if(t==='stats')renderStats();
+  if(t==='export')populateExportFilters();
+}
+
+function populateFilters(){
+  const parts=[...new Set(workouts.map(w=>w.bodyPart))].filter(Boolean).sort();
+  const exes=[...new Set(workouts.map(w=>w.exercise))].filter(Boolean).sort();
+  const fp=document.getElementById('filter-part'),fe=document.getElementById('filter-ex');
+  const pv=fp.value,ev=fe.value;
+  fp.innerHTML='<option value="">All body parts</option>'+parts.map(p=>`<option>${p}</option>`).join('');
+  fe.innerHTML='<option value="">All exercises</option>'+exes.map(e=>`<option>${e}</option>`).join('');
+  fp.value=pv;fe.value=ev;
+}
+
+function populateExportFilters(){
+  const parts=[...new Set(workouts.map(w=>w.bodyPart))].filter(Boolean).sort();
+  const exes=[...new Set(workouts.map(w=>w.exercise))].filter(Boolean).sort();
+  document.getElementById('exp-filter-part').innerHTML='<option value="">All body parts</option>'+parts.map(p=>`<option>${p}</option>`).join('');
+  document.getElementById('exp-filter-ex').innerHTML='<option value="">All exercises</option>'+exes.map(e=>`<option>${e}</option>`).join('');
+}
+
+function getFiltered(){
+  const part=document.getElementById('filter-part').value,ex=document.getElementById('filter-ex').value;
+  const from=document.getElementById('filter-from').value,to=document.getElementById('filter-to').value;
+  return workouts.filter(w=>{
+    if(part&&w.bodyPart!==part)return false;
+    if(ex&&w.exercise!==ex)return false;
+    if(from&&w.date<from)return false;
+    if(to&&w.date>to)return false;
+    return true;
+  });
+}
+
+function getExportFiltered(){
+  const part=document.getElementById('exp-filter-part').value,ex=document.getElementById('exp-filter-ex').value;
+  const from=document.getElementById('exp-from').value,to=document.getElementById('exp-to').value;
+  return workouts.filter(w=>{
+    if(part&&w.bodyPart!==part)return false;
+    if(ex&&w.exercise!==ex)return false;
+    if(from&&w.date<from)return false;
+    if(to&&w.date>to)return false;
+    return true;
+  });
+}
+
+function formatDate(d){
+  const dt=new Date(d+'T00:00:00');
+  return dt.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+}
+
+function renderHistory(){
+  const c=document.getElementById('history-content');
+  const filtered=getFiltered();
+  if(!filtered.length){c.innerHTML='<div class="history-empty"><i class="ti ti-barbell" style="font-size:2rem;display:block;margin-bottom:.5rem" aria-hidden="true"></i>No workouts match the filter.</div>';return;}
+  const grouped={};
+  filtered.forEach(w=>{const k=w.date+'__'+w.day;if(!grouped[k])grouped[k]={date:w.date,day:w.day,entries:[]};grouped[k].entries.push(w);});
+  c.innerHTML=Object.values(grouped).map(g=>`
+    <div class="history-day">
+      <div class="day-header"><div class="day-label">${g.day}</div><div class="day-date">${formatDate(g.date)}</div></div>
+      ${g.entries.map(e=>{
+        const maxW=Math.max(...e.sets.map(s=>parseFloat(s.weight)||0));
+        const pr=getPR(e.exercise);
+        const isPR=maxW>0&&maxW>=pr&&pr>0;
+        return `<div class="workout-entry">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div><div class="entry-part">${e.bodyPart}</div>
+            <div class="entry-name">${e.exercise}${isPR?'<span class="pr-badge"><i class="ti ti-trophy" style="font-size:11px" aria-hidden="true"></i> PR</span>':''}</div></div>
+            <button class="del-entry" onclick="deleteEntry(${e.id})" aria-label="Delete entry"><i class="ti ti-trash" aria-hidden="true"></i></button>
+          </div>
+          <div class="sets-summary">${e.sets.map((s,i)=>`<div class="set-pill">Set ${i+1}: <span>${s.reps} reps × ${dispW(s.weight)} ${unit}</span></div>`).join('')}</div>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+}
+
+function deleteEntry(id){workouts=workouts.filter(w=>w.id!==id);persist();populateFilters();renderHistory();}
+
+function renderPRs(){
+  const c=document.getElementById('prs-content');
+  if(!workouts.length){c.innerHTML='<div class="history-empty"><i class="ti ti-trophy" style="font-size:2rem;display:block;margin-bottom:.5rem" aria-hidden="true"></i>No data yet. Log workouts to track PRs!</div>';return;}
+  const prs={};
+  workouts.forEach(w=>w.sets.forEach(s=>{
+    const wv=parseFloat(s.weight)||0,r=parseInt(s.reps)||0;
+    if(!prs[w.exercise]||wv>prs[w.exercise].maxW)prs[w.exercise]={exercise:w.exercise,part:w.bodyPart,maxW:wv,maxReps:0};
+    if(r>prs[w.exercise].maxReps)prs[w.exercise].maxReps=r;
+  }));
+  const byPart={};
+  Object.values(prs).forEach(p=>{if(!byPart[p.part])byPart[p.part]=[];byPart[p.part].push(p);});
+  c.innerHTML=`<div style="font-size:13px;color:#888;margin-bottom:1rem">Best weight lifted per exercise, all time.</div>`+
+    Object.entries(byPart).map(([part,entries])=>`
+      <div class="pr-section">
+        <div class="section-label" style="color:#c0392b;margin-bottom:.75rem">${part}</div>
+        <table class="pr-table">
+          <thead><tr><th>Exercise</th><th>Best reps</th><th>Best weight</th></tr></thead>
+          <tbody>${entries.sort((a,b)=>b.maxW-a.maxW).map(e=>`
+            <tr><td>${e.exercise}</td><td style="color:#aaa">${e.maxReps} reps</td><td>${dispW(e.maxW)} ${unit}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>`).join('');
+}
+
+function renderStats(){
+  const sessions=[...new Set(workouts.map(w=>w.date))].length;
+  const totalSets=workouts.reduce((a,w)=>a+w.sets.length,0);
+  const totalVolKg=workouts.reduce((a,w)=>a+w.sets.reduce((b,s)=>b+(parseFloat(s.weight)||0)*(parseInt(s.reps)||0),0),0);
+  const prs={};
+  workouts.forEach(w=>w.sets.forEach(s=>{const wv=parseFloat(s.weight)||0;if(!prs[w.exercise]||wv>prs[w.exercise])prs[w.exercise]=wv;}));
+  const dates=[...new Set(workouts.map(w=>w.date))].sort();
+  let cur=0,streak=0;
+  for(let i=0;i<dates.length;i++){
+    if(i===0){cur=1;}else{const diff=(new Date(dates[i])-new Date(dates[i-1]))/(86400000);cur=diff===1?cur+1:1;}
+  }
+  if(dates.length){const last=new Date(dates[dates.length-1]);const today=new Date();today.setHours(0,0,0,0);streak=Math.round((today-last)/86400000)<=1?cur:0;}
+  document.getElementById('stat-sessions').textContent=sessions;
+  document.getElementById('stat-exercises').textContent=workouts.length;
+  document.getElementById('stat-sets').textContent=totalSets;
+  const vol=unit==='lbs'?Math.round(totalVolKg*KG_TO_LBS):Math.round(totalVolKg);
+  document.getElementById('stat-volume').textContent=vol>=1000?(vol/1000).toFixed(1)+'k':vol;
+  document.getElementById('stat-volume-lbl').textContent='Total volume ('+unit+')';
+  document.getElementById('stat-prs').textContent=Object.keys(prs).length;
+  document.getElementById('stat-streak').textContent=streak;
+  const partCounts={};
+  workouts.forEach(w=>{partCounts[w.bodyPart]=(partCounts[w.bodyPart]||0)+1;});
+  const sorted=Object.entries(partCounts).sort((a,b)=>b[1]-a[1]);
+  const total=workouts.length;
+  const d=document.getElementById('stats-detail');
+  if(!workouts.length){d.innerHTML='<div style="color:#aaa;text-align:center;padding:1rem">Log workouts to see stats here.</div>';return;}
+  d.innerHTML=`<div class="section-label" style="margin-bottom:.75rem">Most trained body parts</div>`+
+    sorted.map(([p,count])=>`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span style="font-size:14px;color:#1a1a1a">${p}</span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:120px;height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden">
+          <div style="width:${Math.round(count/total*100)}%;height:100%;background:#c0392b;border-radius:3px"></div>
+        </div>
+        <span style="font-size:13px;color:#aaa;min-width:20px;text-align:right">${count}</span>
+      </div>
+    </div>`).join('');
+}
+
+function buildCSV(data){
+  const BOM='\uFEFF';
+  const rows=[['Date','Day','Body Part','Exercise','Set No.','Reps','Weight (kg)','Weight (lbs)','Volume (kg)']];
+  data.forEach(w=>{
+    w.sets.forEach((s,i)=>{
+      const kg=parseFloat(s.weight)||0;
+      const reps=parseInt(s.reps)||0;
+      rows.push([w.date,w.day,w.bodyPart,w.exercise,i+1,reps,kg.toFixed(2),(kg*KG_TO_LBS).toFixed(2),(kg*reps).toFixed(2)]);
+    });
+  });
+  return BOM+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+}
+
+function exportExcel(){
+  const data=getExportFiltered();
+  if(!data.length){alert('No workouts to export with the current filter.');return;}
+  const csv=buildCSV(data);
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download="Chinmay_Gym_Log.csv";a.click();
+  URL.revokeObjectURL(url);
+  showExportPreview(data);
+}
+
+function showExportPreview(data){
+  const rows=[];
+  data.forEach(w=>{
+    w.sets.forEach((s,i)=>{
+      const kg=parseFloat(s.weight)||0,reps=parseInt(s.reps)||0;
+      rows.push([w.date,w.day,w.bodyPart,w.exercise,i+1,reps,kg.toFixed(2),(kg*KG_TO_LBS).toFixed(2)]);
+    });
+  });
+  const last5=rows.slice(-5);
+  const hdrs=['Date','Day','Part','Exercise','Set','Reps','kg','lbs'];
+  const card=document.getElementById('export-preview-card');
+  const prev=document.getElementById('export-preview');
+  card.style.display='block';
+  prev.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px">
+    <thead><tr>${hdrs.map(h=>`<th style="text-align:left;padding:5px 8px;border-bottom:0.5px solid #eee;color:#888;font-weight:500">${h}</th>`).join('')}</tr></thead>
+    <tbody>${last5.map(r=>`<tr>${r.map(v=>`<td style="padding:5px 8px;border-bottom:0.5px solid #f5f5f5;color:#555">${v}</td>`).join('')}</tr>`).join('')}</tbody>
+  </table>`;
+}
+
+try{unit=localStorage.getItem('chinmaygym_unit')||'kg';}catch(e){}
+setUnit(unit);
+initDate();
+addSet();
+populateFilters();
+</script>
