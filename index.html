@@ -475,8 +475,8 @@ input[type=number]::-webkit-inner-spin-button{opacity:.3}
   <button class="nav-btn" id="nav-settings" onclick="APP.switchTab('settings')"><i class="ti ti-settings"></i>More</button>
 </nav>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" onerror="document.getElementById('loading-overlay').style.display='none'"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js" onerror="document.getElementById('loading-overlay').style.display='none'"></script>
 <script>
 firebase.initializeApp({
   apiKey:"AIzaSyBF1dgw-yK4PzQVLKfoYUYiaFs2RrCIRxc",
@@ -1059,11 +1059,14 @@ APP.previewExport=function(){
   document.getElementById('export-preview').innerHTML='<table style="width:100%;border-collapse:collapse"><thead><tr>'+hdrs.map(function(h){return'<th style="text-align:left;padding:5px 6px;border-bottom:.5px solid var(--border);color:var(--muted);font-weight:500;font-size:11px">'+h+'</th>';}).join('')+'</tr></thead><tbody>'+last5.map(function(r){return'<tr>'+r.map(function(v){return'<td style="padding:5px 6px;border-bottom:.5px solid var(--border);color:#aaa;font-size:11px">'+v+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table>';
 };
 
-// ── FIRESTORE LISTENER ─────────────────────────────────
-db.collection('workouts').orderBy('date','desc').onSnapshot(function(snap){
-  workouts=snap.docs.map(function(d){var data=d.data();data.firestoreId=d.id;return data;});
+/// ── LOADING HELPERS ──────────────────────────────────────────────────────
+var loadingHidden=false;
+function hideLoading(){
+  if(loadingHidden)return;
+  loadingHidden=true;
   document.getElementById('loading-overlay').style.display='none';
-  APP.setSyncStatus('online','Synced');
+}
+function refreshActivePage(){
   populateFilters();
   var active=document.querySelector('.page.active');
   if(active){
@@ -1074,8 +1077,24 @@ db.collection('workouts').orderBy('date','desc').onSnapshot(function(snap){
     if(id==='plan')renderPlan();
     if(id==='analytics'){renderAnalytics();renderPRs();}
   }
+}
+
+// Safety net: show the app within 5 seconds no matter what (mobile network fallback)
+var loadingTimeout=setTimeout(function(){
+  hideLoading();
+  APP.setSyncStatus('error','Offline');
+},5000);
+
+// ── FIRESTORE LISTENER ──────────────────────────────────────────────────────
+db.collection('workouts').orderBy('date','desc').onSnapshot(function(snap){
+  clearTimeout(loadingTimeout);
+  workouts=snap.docs.map(function(d){var data=d.data();data.firestoreId=d.id;return data;});
+  hideLoading();
+  APP.setSyncStatus('online','Synced');
+  refreshActivePage();
 },function(err){
-  document.getElementById('loading-overlay').style.display='none';
+  clearTimeout(loadingTimeout);
+  hideLoading();
   APP.setSyncStatus('error','Offline');
   console.error(err);
 });
